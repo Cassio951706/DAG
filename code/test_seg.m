@@ -62,6 +62,7 @@ if strfind(model_select, 'det')
     detection_visualization(image+r, boxes, net, config);
     
 else if strfind(model_select, 'seg')
+    for i = 1:length(segList)
         % prepare segmentation data
         seg_mask_ori = imread(sprintf('../data/%s.png', im_name)); 
         seg_mask_ori(seg_mask_ori == 255) = 0; % ignore white space
@@ -73,6 +74,7 @@ else if strfind(model_select, 'seg')
         mask(mask~=0) = target_idx_candidate_shuffle(mask(mask~=0)); % assign a random color
         [r, itr, status, box_num, seg_result] = fooling_seg_net(image, double(mask'), double(seg_mask_ori'), net, config);
         imshow(seg_result, colormap);
+    end
         
     else
         error('this model type is not available in our setting')

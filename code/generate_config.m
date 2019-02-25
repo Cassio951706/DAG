@@ -15,9 +15,13 @@ if strfind(model_select, 'det')
     im_name = '2007_000925';
 else
     MAX_ITER = 200; % max iteration number for segmentation
-    % 
-    
-    im_name = '2011_003271';
+    % set seg image path
+	segListPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/ImageSets/Segmentation/test.set';
+    segList = textread(segListPath,'%s');
+    imgDirPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/SegmentationClass/';
+  
+
+    % im_name = '2011_003271';
     % choose the geometric shape that you want, e.g. square, circle, strip
     shape = 'square';
 end
