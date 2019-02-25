@@ -15,6 +15,8 @@ if strfind(model_select, 'det')
     im_name = '2007_000925';
 else
     MAX_ITER = 200; % max iteration number for segmentation
+    % 
+    
     im_name = '2011_003271';
     % choose the geometric shape that you want, e.g. square, circle, strip
     shape = 'square';
