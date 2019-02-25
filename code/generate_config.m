@@ -10,6 +10,8 @@ model_select = 'seg_fcn_alexnet';
 % model_select = 'det_VGG';
 % model_select = 'det_ZF';
 
+imgDirPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/JPEGImages/';
+
 if strfind(model_select, 'det')
     MAX_ITER = 150; % max iteration number for detection
     im_name = '2007_000925';
@@ -18,10 +20,7 @@ else
     % set seg image path
 	segListPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/ImageSets/Segmentation/test.set';
     segList = textread(segListPath,'%s');
-    imgDirPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/SegmentationClass/';
-  
-
-    % im_name = '2011_003271';
+    segclsDirPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/SegmentationClass/';
     % choose the geometric shape that you want, e.g. square, circle, strip
     shape = 'square';
 end

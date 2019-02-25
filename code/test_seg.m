@@ -23,24 +23,14 @@ net = caffe.Net(net_model, net_weights, 'test');
 %% generating adversarial examples now
 fprintf('now generating adversarial examples for %s\n\n', model_select);
 
-% prepare image info
-image = imread(sprintf('../data/%s.jpg', im_name));
-
-if strfind(model_select, 'det')
-    % for the detection network, input short size is 600
-    image = myresize(image, 600, 'short'); 
-end
-if size(image, 3) == 1
-    image = cat(3, image, image, image);
-end
-% convert image format
-image = image(:, :, [3, 2, 1]);  % format: W x H x C with BGR channels
-image = single(image);  % convert from uint8 to single
-image = bsxfun(@minus, image, mean_data);% subtract mean_data (already in W x H x C, BGR)
-image = permute(image, [2, 1, 3]);  % flip width and height
-
 % r means noise perturbation, itr means iteration number
 if strfind(model_select, 'det')
+
+    if strfind(model_select, 'det')
+        % for the detection network, input short size is 600
+        image = myresize(image, 600, 'short'); 
+    end
+
     xml_info = VOCreadrecxml(sprintf('../data/%s.xml', im_name));
     annotation = xml_info.objects; % object detection annotation
     ratio = 600/min(xml_info.imgsize(1:2));  
@@ -63,8 +53,21 @@ if strfind(model_select, 'det')
     
 else if strfind(model_select, 'seg')
     for i = 1:length(segList)
+        % prepare image info
+        im_name = segList{i};
+        image = imread([imgDirPath im_name '.jpg']);
+        if size(image, 3) == 1
+            image = cat(3, image, image, image);
+        end
+
+        % convert image format
+        image = image(:, :, [3, 2, 1]);  % format: W x H x C with BGR channels
+        image = single(image);  % convert from uint8 to single
+        image = bsxfun(@minus, image, mean_data);% subtract mean_data (already in W x H x C, BGR)
+        image = permute(image, [2, 1, 3]);  % flip width and height
+
         % prepare segmentation data
-        seg_mask_ori = imread(sprintf('../data/%s.png', im_name)); 
+        seg_mask_ori = imread([segclsDirPath im_name '.png']); 
         seg_mask_ori(seg_mask_ori == 255) = 0; % ignore white space
         gt_idx = unique(seg_mask_ori);
         gt_idx(gt_idx == 0) = []; % ignore class background
