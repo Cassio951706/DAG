@@ -102,4 +102,4 @@ imagesc((image_fool)/255)
 subplot(1,3,3)
 imagesc(r)
 
-caffe.reset_all();;
+caffe.reset_all();
