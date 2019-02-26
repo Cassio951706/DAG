@@ -71,12 +71,21 @@ else if strfind(model_select, 'seg')
         seg_mask_ori(seg_mask_ori == 255) = 0; % ignore white space
         gt_idx = unique(seg_mask_ori);
         gt_idx(gt_idx == 0) = []; % ignore class background
-        [~, target_idx_candidate_shuffle] = generate_mapping(gt_idx);        
-        %% no shape, change this
-        load(sprintf('../data/%s.mat', shape)); % load pre-defined mask
+        [~, target_idx_candidate_shuffle] = generate_mapping(gt_idx);  
+
+        % use the original mask
+        mask = seg_mask_ori; 
         mask(mask~=0) = target_idx_candidate_shuffle(mask(mask~=0)); % assign a random color
         [r, itr, status, box_num, seg_result] = fooling_seg_net(image, double(mask'), double(seg_mask_ori'), net, config);
-        imshow(seg_result, colormap);
+        % imshow(seg_result, colormap);
+
+        %calculate mIOU
+
+        % save corresponding adversarial examples x+r and peturbation r and seg_result
+        mkdir_if_missing('../segResult');
+
+
+
     end
         
     else

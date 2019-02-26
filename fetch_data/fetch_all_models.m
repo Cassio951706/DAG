@@ -28,5 +28,3 @@ urlwrite('http://dl.caffe.berkeleyvision.org/fcn-alexnet-pascal.caffemodel', ...
     '../weight/fcn-alexnet-pascal.caffemodel');
 
 fprintf('Segmentation Models Done.\n');
-
-

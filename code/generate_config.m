@@ -1,6 +1,5 @@
 %% config files of the demo.m
 
-addpath('../data/');
 addpath('../functions/');
 load('pascal_seg_colormap.mat');
 load('legend_voc.mat');
@@ -21,8 +20,6 @@ else
 	segListPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/ImageSets/Segmentation/test.set';
     segList = textread(segListPath,'%s');
     segclsDirPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/SegmentationClass/';
-    % choose the geometric shape that you want, e.g. square, circle, strip
-    shape = 'square';
 end
 
 step_length = 0.5; % the step length of back-propagation direction
