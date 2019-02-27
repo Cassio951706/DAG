@@ -13,7 +13,8 @@ catch
 end
 
 % add matlab caffe path
-addpath('../caffe/matlab/');
+% addpath('../caffe/matlab/');
+addpath('/home/du/gitcode/caffe-fast-rcnn/matlab');
 
 % load caffe models
 caffe.set_mode_gpu(); %caffe.set_mode_cpu();

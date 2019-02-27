@@ -3,7 +3,7 @@
 clear
 close all;
 
-config ='generate_config';
+config ='generate_test_config';
 
 try
     eval(config);
