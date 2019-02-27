@@ -4,6 +4,10 @@ addpath('../functions/');
 load('pascal_seg_colormap.mat');
 load('legend_voc.mat');
 
+VOCinit;
+
+cmap = VOClabelcolormap(255);
+
 % model_select = 'seg_fcn_8s';
 model_select = 'seg_fcn_alexnet';
 % model_select = 'det_VGG';
@@ -17,9 +21,38 @@ if strfind(model_select, 'det')
 else
     MAX_ITER = 200; % max iteration number for segmentation
     % set seg image path
-	segListPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/ImageSets/Segmentation/test.set';
-    segList = textread(segListPath,'%s');
-    segclsDirPath = '/home/xy/workspace/datasets/VOCdevkit/VOC2007/SegmentationClass/';
+    imgids=textread(sprintf(VOCopts.seg.imgsetpath,VOCopts.testset),'%s');
+	% set seg result path
+    resultsdir = sprintf(VOCopts.seg.clsresdir,VOCopts.testset);
+    mkdir_if_missing(resultsdir);
+    classlabelfile = sprintf(VOCopts.seg.clsrespath,segid,VOCopts.testset,imname);
+
+
+
+% Write out the segmentations
+
+    classlabelfile = sprintf(VOCopts.seg.clsrespath,segid,VOCopts.testset,imname);
+    
+
+    imgfile = sprintf(VOCopts.imgpath,imname);
+    imginfo = imfinfo(imgfile);
+
+    vdets=dets(strmatch(imname,detids,'exact'));
+    
+    [instim,classim]= convert_dets_to_image(imginfo.Width, imginfo.Height,vdets,confidence);
+    % imwrite(instim,cmap,instlabelfile);
+    imwrite(classim,cmap,classlabelfile);   
+
+
+
+
+
+
+
+
+    
+    mkdir_if_missing('../result/segPerturbation');
+    mkdir_if_missing('../result/segResult');
 end
 
 step_length = 0.5; % the step length of back-propagation direction

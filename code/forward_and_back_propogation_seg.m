@@ -55,8 +55,7 @@ else
     res_pred = net.backward({dzdy}); %do backward pass
     res_pred = res_pred{1};
     
-    res = res_fool - res_pred;
-    
+    res = res_fool - res_pred;    
     
 end
 

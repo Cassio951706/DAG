@@ -6,4 +6,3 @@ if ~exist(directory, 'dir')
     mkdir(directory);
 end
 end % end of function
-

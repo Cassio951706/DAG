@@ -24,13 +24,10 @@ net = caffe.Net(net_model, net_weights, 'test');
 fprintf('now generating adversarial examples for %s\n\n', model_select);
 
 % r means noise perturbation, itr means iteration number
-if strfind(model_select, 'det')
-
-    if strfind(model_select, 'det')
-        % for the detection network, input short size is 600
-        image = myresize(image, 600, 'short'); 
-    end
-
+if strfind(model_select, 'det')  
+    % for the detection network, input short size is 600
+    image = myresize(image, 600, 'short'); 
+    
     xml_info = VOCreadrecxml(sprintf('../data/%s.xml', im_name));
     annotation = xml_info.objects; % object detection annotation
     ratio = 600/min(xml_info.imgsize(1:2));  
@@ -52,68 +49,72 @@ if strfind(model_select, 'det')
     detection_visualization(image+r, boxes, net, config);
     
 else if strfind(model_select, 'seg')
-    for i = 1:length(segList)
-        % prepare image info
-        im_name = segList{i};
-        image = imread([imgDirPath im_name '.jpg']);
-        if size(image, 3) == 1
-            image = cat(3, image, image, image);
+        for i = 1:length(imgids)
+            % prepare image info
+            im_name = imgids{i};
+            image = imread(sprintf(VOCopts.seg.imgpath,im_name));    
+           
+            if size(image, 3) == 1
+                image = cat(3, image, image, image);
+            end
+
+            % convert image format
+            image = image(:, :, [3, 2, 1]);  % format: W x H x C with BGR channels
+            image = single(image);  % convert from uint8 to single
+            image = bsxfun(@minus, image, mean_data);% subtract mean_data (already in W x H x C, BGR)
+            image = permute(image, [2, 1, 3]);  % flip width and height
+
+            % prepare segmentation data           
+            seg_mask_ori = imread(sprintf(VOCopts.seg.clsimgpath,imname)); 
+            seg_mask_ori(seg_mask_ori == 255) = 0; % ignore white space
+            gt_idx = unique(seg_mask_ori);
+            gt_idx(gt_idx == 0) = []; % ignore class background
+            [~, target_idx_candidate_shuffle] = generate_mapping(gt_idx);  
+
+            % use the original mask
+            mask = seg_mask_ori; 
+            mask(mask~=0) = target_idx_candidate_shuffle(mask(mask~=0)); % assign a random color
+       
+            [r, itr, status, box_num, seg_result] = fooling_seg_net(image, double(mask'), double(seg_mask_ori'), net, config);
+
+            % restore the images to normal status
+            image_fool = image + r;
+            image_fool = permute(image_fool, [2,1,3]);
+            image_fool = bsxfun(@plus, image_fool, mean_data);
+            image_fool = image_fool(:, :, [3,2,1]);
+
+            % also do processing for r
+            r = permute(r, [2,1,3]);
+            r = r(:, :, [3,2,1]);
+
+            % save corresponding adversarial examples x+r and peturbation r and seg_result
+            imwrite(image_fool/255, ['../result/segAdvExa/' im_name '.jpg']);
+            imwrite(r, ['../result/segPerturbation/' im_name '.jpg']);
+            imwrite(seg_result, colormap, ['../result/segResult' im_name '.png']);
+
+            %calculate mIOU 
+            match_situation = (seg_result == seg_mask_target);
+
+            match_area = sum(sum(match_situation));
+            target_area = size(seg_mask_target,1)*size(seg_mask_target,2) - match_area;
+                     
+            % joint histogram
+            sumim = 1+gtim+resim*num; 
+            hs = histc(sumim(locs),1:num*num); 
+            count = count + numel(find(locs));
+            confcounts(:) = confcounts(:) + hs(:)
+
+
+
+
         end
-
-        % convert image format
-        image = image(:, :, [3, 2, 1]);  % format: W x H x C with BGR channels
-        image = single(image);  % convert from uint8 to single
-        image = bsxfun(@minus, image, mean_data);% subtract mean_data (already in W x H x C, BGR)
-        image = permute(image, [2, 1, 3]);  % flip width and height
-
-        % prepare segmentation data
-        seg_mask_ori = imread([segclsDirPath im_name '.png']); 
-        seg_mask_ori(seg_mask_ori == 255) = 0; % ignore white space
-        gt_idx = unique(seg_mask_ori);
-        gt_idx(gt_idx == 0) = []; % ignore class background
-        [~, target_idx_candidate_shuffle] = generate_mapping(gt_idx);  
-
-        % use the original mask
-        mask = seg_mask_ori; 
-        mask(mask~=0) = target_idx_candidate_shuffle(mask(mask~=0)); % assign a random color
-        [r, itr, status, box_num, seg_result] = fooling_seg_net(image, double(mask'), double(seg_mask_ori'), net, config);
-        % imshow(seg_result, colormap);
-
         %calculate mIOU
-
-        % save corresponding adversarial examples x+r and peturbation r and seg_result
-        mkdir_if_missing('../segResult');
-
-
-
-    end
+       
         
     else
         error('this model type is not available in our setting')
         
     end
 end
-
-%% show another visualization
-% restore the images to normal status
-image_fool = image + r;
-image_fool = permute(image_fool, [2,1,3]);
-image_fool = bsxfun(@plus, image_fool, mean_data);
-image_fool = image_fool(:, :, [3,2,1]);
-
-% also do processing for r
-r = permute(r, [2,1,3]);
-r = r(:, :, [3,2,1]);
-
-fig = figure(2);
-scr_size = get(0,'screensize');
-set(fig,'pos',[scr_size(3)/2,scr_size(4)/2,900,250]);
-pbaspect([1,1,1])
-subplot(1,3,1)
-imagesc((image_fool - r)/255)
-subplot(1,3,2)
-imagesc((image_fool)/255)
-subplot(1,3,3)
-imagesc(r)
 
 caffe.reset_all();
