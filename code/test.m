@@ -52,7 +52,7 @@ else if strfind(model_select, 'seg')
         for i = 1:length(imgids)
             % prepare image info
             im_name = imgids{i};
-            image = imread(sprintf(VOCopts.seg.imgpath,im_name));    
+            image = imread(sprintf(VOCopts.imgpath,im_name));    
            
             if size(image, 3) == 1
                 image = cat(3, image, image, image);
@@ -65,7 +65,7 @@ else if strfind(model_select, 'seg')
             image = permute(image, [2, 1, 3]);  % flip width and height
 
             % prepare segmentation data           
-            seg_mask_ori = imread(sprintf(VOCopts.seg.clsimgpath,imname)); 
+            seg_mask_ori = imread(sprintf(VOCopts.seg.clsimgpath,im_name)); 
             seg_mask_ori(seg_mask_ori == 255) = 0; % ignore white space
             gt_idx = unique(seg_mask_ori);
             gt_idx(gt_idx == 0) = []; % ignore class background
@@ -87,29 +87,14 @@ else if strfind(model_select, 'seg')
             r = permute(r, [2,1,3]);
             r = r(:, :, [3,2,1]);
 
-            % save corresponding adversarial examples x+r and peturbation r and seg_result
-            imwrite(image_fool/255, ['../result/segAdvExa/' im_name '.jpg']);
-            imwrite(r, ['../result/segPerturbation/' im_name '.jpg']);
-            imwrite(seg_result, colormap, ['../result/segResult' im_name '.png']);
-
-            %calculate mIOU 
-            match_situation = (seg_result == seg_mask_target);
-
-            match_area = sum(sum(match_situation));
-            target_area = size(seg_mask_target,1)*size(seg_mask_target,2) - match_area;
-                     
-            % joint histogram
-            sumim = 1+gtim+resim*num; 
-            hs = histc(sumim(locs),1:num*num); 
-            count = count + numel(find(locs));
-            confcounts(:) = confcounts(:) + hs(:)
-
-
-
-
+            % save corresponding seg_result and adversarial examples x+r and peturbation r 
+            imwrite(seg_result,colormap,sprintf(VOCopts.seg.clsrespath,VOCopts.testset,im_name)); 
+            imwrite(image_fool/255, sprintf(VOCopts.seg.advexppath,VOCopts.testset,im_name));
+            imwrite(r, sprintf(VOCopts.seg.advptbpath,VOCopts.testset,im_name));       
         end
+
         %calculate mIOU
-       
+        VOCevalseg(VOCopts);
         
     else
         error('this model type is not available in our setting')

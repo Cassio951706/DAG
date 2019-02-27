@@ -6,8 +6,6 @@ load('legend_voc.mat');
 
 VOCinit;
 
-cmap = VOClabelcolormap(255);
-
 % model_select = 'seg_fcn_8s';
 model_select = 'seg_fcn_alexnet';
 % model_select = 'det_VGG';
@@ -23,36 +21,9 @@ else
     % set seg image path
     imgids=textread(sprintf(VOCopts.seg.imgsetpath,VOCopts.testset),'%s');
 	% set seg result path
-    resultsdir = sprintf(VOCopts.seg.clsresdir,VOCopts.testset);
-    mkdir_if_missing(resultsdir);
-    classlabelfile = sprintf(VOCopts.seg.clsrespath,segid,VOCopts.testset,imname);
-
-
-
-% Write out the segmentations
-
-    classlabelfile = sprintf(VOCopts.seg.clsrespath,segid,VOCopts.testset,imname);
-    
-
-    imgfile = sprintf(VOCopts.imgpath,imname);
-    imginfo = imfinfo(imgfile);
-
-    vdets=dets(strmatch(imname,detids,'exact'));
-    
-    [instim,classim]= convert_dets_to_image(imginfo.Width, imginfo.Height,vdets,confidence);
-    % imwrite(instim,cmap,instlabelfile);
-    imwrite(classim,cmap,classlabelfile);   
-
-
-
-
-
-
-
-
-    
-    mkdir_if_missing('../result/segPerturbation');
-    mkdir_if_missing('../result/segResult');
+    mkdir_if_missing(sprintf(VOCopts.seg.clsresdir,VOCopts.testset));
+    mkdir_if_missing(sprintf(VOCopts.seg.advexpdir,VOCopts.testset));
+    mkdir_if_missing(sprintf(VOCopts.seg.advptbdir,VOCopts.testset));          
 end
 
 step_length = 0.5; % the step length of back-propagation direction

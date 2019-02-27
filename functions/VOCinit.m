@@ -42,12 +42,17 @@ VOCopts.detrespath=[VOCopts.resdir 'Main/%s_det_' VOCopts.testset '_%s.txt'];
 % initialize segmentation task paths
 
 VOCopts.seg.clsimgpath=[VOCopts.datadir VOCopts.dataset '/SegmentationClass/%s.png'];
-VOCopts.seg.instimgpath=[VOCopts.datadir VOCopts.dataset '/SegmentationObject/%s.png'];
 
 VOCopts.seg.imgsetpath=[VOCopts.datadir VOCopts.dataset '/ImageSets/Segmentation/%s.txt'];
 
-VOCopts.seg.clsresdir=[VOCopts.resdir 'Segmentation/%s_cls'];
+VOCopts.seg.clsresdir=[VOCopts.resdir 'Segmentation/%s_clsres'];
 VOCopts.seg.clsrespath=[VOCopts.seg.clsresdir '/%s.png'];
+
+VOCopts.seg.advexpdir=[VOCopts.resdir 'Segmentation/%s_advexp'];
+VOCopts.seg.advexppath=[VOCopts.seg.advexpdir '/%s.jpg'];
+
+VOCopts.seg.advptbdir=[VOCopts.resdir 'Segmentation/%s_advptb'];
+VOCopts.seg.advptbpath=[VOCopts.seg.advptbdir '/%s.jpg'];
 
 % initialize the VOC challenge options
 

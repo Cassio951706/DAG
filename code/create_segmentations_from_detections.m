@@ -69,7 +69,7 @@ for j=1:numel(imgids)
     imname = imgids{j};
 
     classlabelfile = sprintf(VOCopts.seg.clsrespath,segid,VOCopts.testset,imname);
-    instlabelfile = sprintf(VOCopts.seg.instrespath,segid,VOCopts.testset,imname);
+    % instlabelfile = sprintf(VOCopts.seg.instrespath,segid,VOCopts.testset,imname);
 
     imgfile = sprintf(VOCopts.imgpath,imname);
     imginfo = imfinfo(imgfile);
