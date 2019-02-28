@@ -12,9 +12,6 @@ catch
     keyboard;
 end
 
-% add matlab caffe path
-addpath('../caffe/matlab/');
-
 % load caffe models
 caffe.set_mode_gpu(); %caffe.set_mode_cpu();
 caffe.set_device(0)
